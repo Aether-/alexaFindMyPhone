@@ -18,3 +18,9 @@ To-Do List for 04/19/2019:
 - Fix bug so that CallPhoneIntent runs properly //SOLVED
 - Figure out how to implement Twilio (most likely using a lambda function separate from the alexa skill) 
 
+04/19/2019: 
+
+Issues: 
+- Obtaining permissions in order to have app read phone number 
+- Using the api access token/permissionsconsentcard
+
