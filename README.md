@@ -8,4 +8,9 @@ Knowledge:
 - Learned that Twilio offers a way to call phone numbers programmatically 
 - Created Twilio account and read about the method to call phone numbers 
 Testing: 
--
+- Invocation works
+- Bug: "You've triggered the CallPhoneIntent" instead of the speechText in the CallPhoneIntent
+To-Do List: 
+- Fix bug so that CallPhoneIntent runs properly 
+- Figure out how to implement Twilio (most likely using a lambda function separate from the alexa skill) 
+
