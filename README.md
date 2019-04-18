@@ -1,5 +1,6 @@
 # alexaFindMyPhone
 an Alexa Skill that calls your phone to find it 
+
 04/18/2019: 
 Knowledge: 
 - Learned what intents are and how they are handled by alexa
