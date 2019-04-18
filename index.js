@@ -20,7 +20,7 @@ const CallPhoneIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === 'CallPhoneIntent';
     },
     handle(handlerInput) {
-        var callNumber = getPhoneNumber();
+        var callNumber = getPhoneNumber(); //stores customer phone # as a string
         
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -34,19 +34,19 @@ function getPhoneNumber(){ //function assumes that permission has been handled
         host: 'api.amazonalexa.com',
         path: '/' + encodeURIComponent('v2/accounts/~current/settings/Profile.mobileNumber'),
         method: 'GET',
-    }; //calls the api and gets the customer's phone number so that options becomes the phone number, which is stored as {"countryCode": "string", "phoneNumber": "string"}
+    }; //calls the api and gets the customer's phone number
     
     var req = https.request(options, res => {
         res.setEncoding('utf8');
         var responseString = "";
-        var strArray = new Array();
+        var strArray = new Array(); //since mobileNumber is stored as {"countryCode": "string", "phoneNumber": "string"} looking at both and placing in array is easy 
         
         res.on('data', chunk =>{
-            strArray.push(chunk)
+            strArray.push(chunk) //store strings into array 
         })
         
         res.on('end',()=>{
-            responseString = strArray.pop(1)
+            responseString = strArray.pop(1) //pop the phoneNumber because that's all that's needed 
             console.log(responseString);
             callback(responseString);
         });
