@@ -12,7 +12,7 @@ Knowledge:
 
 Testing: 
 - Invocation works
-- Bug: "You've triggered the CallPhoneIntent" instead of the speechText in the CallPhoneIntent
+- Bug: "You've triggered the CallPhoneIntent" instead of the speechText in the CallPhoneIntent //SOLVED: in the exports.handler, CallPhoneIntent was commented out
 
 To-Do List: 
 - Fix bug so that CallPhoneIntent runs properly 
