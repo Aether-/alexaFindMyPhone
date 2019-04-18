@@ -1,4 +1,7 @@
 
+// This sample demonstrates handling intents from an Alexa skill using the Alexa Skills Kit SDK (v2).
+// Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
+// session persistence, api calls, and more.
 const Alexa = require('ask-sdk-core');
 const https = require('https');
 
@@ -7,7 +10,7 @@ const LaunchRequestHandler = {
         return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
     },
     handle(handlerInput) {
-        const speechText = 'Welcome,you can ask me to call your phone or provide its location. What would you like me to do?';
+        const speechText = 'Welcome, you can ask me to call your phone or provide its location. What would you like me to do?';
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -20,8 +23,8 @@ const CallPhoneIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === 'CallPhoneIntent';
     },
     handle(handlerInput) {
-        var callNumber = getPhoneNumber(); //stores customer phone # as a string
-        
+        var callNumber = getPhoneNumber();
+        const speechText = "I've called your phone";
         return handlerInput.responseBuilder
             .speak(speechText)
             //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
@@ -34,38 +37,27 @@ function getPhoneNumber(){ //function assumes that permission has been handled
         host: 'api.amazonalexa.com',
         path: '/' + encodeURIComponent('v2/accounts/~current/settings/Profile.mobileNumber'),
         method: 'GET',
-    }; //calls the api and gets the customer's phone number
+    }; //calls the api and gets the customer's phone number so that options becomes the phone number, which is stored as {"countryCode": "string", "phoneNumber": "string"}
     
     var req = https.request(options, res => {
         res.setEncoding('utf8');
         var responseString = "";
-        var strArray = new Array(); //since mobileNumber is stored as {"countryCode": "string", "phoneNumber": "string"} looking at both and placing in array is easy 
+        var strArray = new Array();
         
         res.on('data', chunk =>{
-            strArray.push(chunk) //store strings into array 
+            strArray.push(chunk)
         })
         
         res.on('end',()=>{
-            responseString = strArray.pop(1) //pop the phoneNumber because that's all that's needed 
+            responseString = strArray.pop(1)
             console.log(responseString);
-            callback(responseString);
+
         });
     });
     req.end();
 }
 function sendPhoneNumber(){
     
-}
-const PermissionCallIntentHandler = {
-    canHandle(handlerInput){
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest' 
-                && handlerInput.requestEnvelope.request.intent.name === 'PermissionCallIntent';
-    },
-    handle(handlerInput){
-        if(apiAccesstoken == )
-        let accessToken = this.event.context.System.apiAccessToken;
-        
-    }
 }
 const LocationIntentHandler = {
     canHandle(handlerInput) {
@@ -147,7 +139,7 @@ const ErrorHandler = {
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
-        CallPhoneIntentHandler,
+        //CallPhoneIntentHandler,//
         LocationIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
