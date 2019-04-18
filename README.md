@@ -14,7 +14,7 @@ Testing:
 - Invocation works
 - Bug: "You've triggered the CallPhoneIntent" instead of the speechText in the CallPhoneIntent //SOLVED: in the exports.handler, CallPhoneIntent was commented out
 
-To-Do List: 
+To-Do List for 04/19/2019: 
 - Fix bug so that CallPhoneIntent runs properly //SOLVED
 - Figure out how to implement Twilio (most likely using a lambda function separate from the alexa skill) 
 
