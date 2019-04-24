@@ -1,26 +1,15 @@
 # alexaFindMyPhone
-an Alexa Skill that calls your phone to find it 
+an Alexa Skill that calls your phone to find it; Since Amazon does not have inherent calling functions, we need to use an outside API in order to do the actual calling. The skeleton for the app is as follows: 
 
-04/18/2019: 
+User tells Alexa to find their phone 
 
-Knowledge: 
-- Learned what intents are and how they are handled by alexa
-- Learned how to make api calls to alexa as well as other API's
-- Learned about asynchronous response as well as how to call API to retrieve customer phone number 
-- Learned that Twilio offers a way to call phone numbers programmatically 
-- Created Twilio account and read about the method to call phone numbers 
+Through the Alexa Skill Kit and Intent handlers, AWS translates into machine code. Then, the lambda function will call Amazon's API in order to retrieve the user's phone number. 
 
-Testing: 
-- Invocation works
-- Bug: "You've triggered the CallPhoneIntent" instead of the speechText in the CallPhoneIntent //SOLVED: in the exports.handler, CallPhoneIntent was commented out
+From there, the lambda function then sends this information to Twilio, which then places the phone call. On successful call, Twilio then sends a "success" message to the lambda function. The lambda function then sends a "success" message to the Alexa Skill Kit which then allows Alexa to respond with a "call successful". 
 
-To-Do List for 04/19/2019: 
-- Fix bug so that CallPhoneIntent runs properly //SOLVED
-- Figure out how to implement Twilio (most likely using a lambda function separate from the alexa skill) 
+Front End: Alexa (Voice interface) 
 
-04/19/2019: 
+Database: Amazon's servers (since a customer who uses Alexa will have an Amazon account with a phone number linked, just need to call an API) 
 
-Issues: 
-- Obtaining permissions in order to have app read phone number 
-- Using the api access token/permissionsconsentcard
+Back End: Lambda function + Twilio program (to place call) 
 
