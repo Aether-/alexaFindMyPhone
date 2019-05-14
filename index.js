@@ -1,72 +1,96 @@
-
+// This sample demonstrates handling intents from an Alexa skill using the Alexa Skills Kit SDK (v2).
+// Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
+// session persistence, api calls, and more.
 const Alexa = require('ask-sdk-core');
-const https = require('https');
+const messages = {
+    NOTIFY_MISSING_PERMISSIONS: 'Please enable profile permissions in the Amazon Alexa App.',
+    ERROR: 'Uh Oh. Looks like something went wrong.'
+};
+var PHONE_Number;
+const MOBILE_PERMISSION = "alexa::profile:mobile_number:read";
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
+        return handlerInput.requestEnvelope.request.type === 'LaunchRequest'  
     },
     handle(handlerInput) {
-        const speechText = 'Welcome,you can ask me to call your phone or provide its location. What would you like me to do?';
+        const speechText = 'Welcome, you can ask me to call your phone or provide its location. What would you like me to do?';
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
             .getResponse();
     }
 };
-const CallPhoneIntentHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'CallPhoneIntent';
+const GetPhoneNumberIntent = {
+    canHandle(handlerInput){
+        const { request } = handlerInput.requestEnvelope;
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest' 
+         && handlerInput.requestEnvelope.request.intent.name === 'GetPhoneNumberIntent';
     },
-    handle(handlerInput) {
-        var callNumber = getPhoneNumber(); //stores customer phone # as a string
-        
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+    async handle(handlerInput) {
+    const { requestEnvelope, serviceClientFactory, responseBuilder } = handlerInput;
+    const consentToken = requestEnvelope.context.System.user.permissions
+      && requestEnvelope.context.System.user.permissions.consentToken;
+    if(!consentToken){
+        return responseBuilder
+            .speak('Please enable mobile phone permissions in the Amazon Alexa app.')
+            .withAskForPermissionsConsentCard(['alexa::profile:mobile_number:read'])
             .getResponse();
-            //apiAccessToken
     }
+    try {
+      const upsServiceClient = serviceClientFactory.getUpsServiceClient();
+      const profileMobileObject = await upsServiceClient.getProfileMobileNumber();
+     
+      const profileMobile = profileMobileObject.phoneNumber;
+      PHONE_Number = profileMobile;
+      const speechResponse = `Hello your mobile number is, ${profileMobile}`;
+      const cardResponse = `Hello your mobile number is, ${profileMobile}`
+      return responseBuilder
+                      .speak(speechResponse)
+                      .withSimpleCard("FindMyPhone", cardResponse)
+                      .getResponse();
+    } catch (error) {
+      console.log(JSON.stringify(error));
+      if (error.statusCode === 403) {
+        return responseBuilder
+        .speak(messages.NOTIFY_MISSING_PERMISSIONS)
+        .withAskForPermissionsConsentCard([MOBILE_PERMISSION])
+        .getResponse();
+      }
+      console.log(JSON.stringify(error));
+      const response = responseBuilder.speak(messages.ERROR).getResponse();
+      return response;
+    }
+  },
+
 };
-function getPhoneNumber(){ //function assumes that permission has been handled
+/*function getPhoneNumber(){ //function assumes that permission has been handled
     var options = {
         host: 'api.amazonalexa.com',
         path: '/' + encodeURIComponent('v2/accounts/~current/settings/Profile.mobileNumber'),
         method: 'GET',
-    }; //calls the api and gets the customer's phone number
+    }; //calls the api and gets the customer's phone number so that options becomes the phone number, which is stored as {"countryCode": "string", "phoneNumber": "string"}
     
     var req = https.request(options, res => {
         res.setEncoding('utf8');
         var responseString = "";
-        var strArray = new Array(); //since mobileNumber is stored as {"countryCode": "string", "phoneNumber": "string"} looking at both and placing in array is easy 
+        var strArray = new Array();
         
         res.on('data', chunk =>{
-            strArray.push(chunk) //store strings into array 
+            strArray.push(chunk)
         })
         
         res.on('end',()=>{
-            responseString = strArray.pop(1) //pop the phoneNumber because that's all that's needed 
+            responseString = strArray.pop(1)
             console.log(responseString);
-            callback(responseString);
+
         });
     });
     req.end();
 }
 function sendPhoneNumber(){
     
-}
-const PermissionCallIntentHandler = {
-    canHandle(handlerInput){
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest' 
-                && handlerInput.requestEnvelope.request.intent.name === 'PermissionCallIntent';
-    },
-    handle(handlerInput){
-        if(apiAccesstoken == )
-        let accessToken = this.event.context.System.apiAccessToken;
-        
-    }
-}
+}*/
 const LocationIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -144,14 +168,16 @@ const ErrorHandler = {
 // This handler acts as the entry point for your skill, routing all request and response
 // payloads to the handlers above. Make sure any new handlers or interceptors you've
 // defined are included below. The order matters - they're processed top to bottom.
+
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
-        CallPhoneIntentHandler,
+        GetPhoneNumberIntent,
         LocationIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
-        IntentReflectorHandler) // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
+        IntentReflectorHandler)// make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
     .addErrorHandlers(
         ErrorHandler)
+    .withApiClient(new Alexa.DefaultApiClient())
     .lambda();
